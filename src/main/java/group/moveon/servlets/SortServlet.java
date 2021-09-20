@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 
-@WebServlet("/organizations")
-public class OrgServlet extends HttpServlet {
+@WebServlet("/sort/*")
+public class SortServlet extends HttpServlet {
     private Connection connection;
 
     @Override
@@ -19,7 +19,8 @@ public class OrgServlet extends HttpServlet {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "12032001");
             System.out.println("Successfully set!");
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ORGANIZATION");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ORGANIZATION ORDER BY "
+                    + req.getPathInfo().replace("/", ""));
             statement.execute();
             ResultSet rs = statement.getResultSet();
             rs.next();
@@ -60,29 +61,6 @@ public class OrgServlet extends HttpServlet {
             printWriter.write(String.valueOf(xmlStr));
             printWriter.close();
 
-
-            connection.close();
-        } catch (SQLException |ClassNotFoundException throwable) {
-            throwable.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "12032001");
-            System.out.println("Successfully set!");
-            PreparedStatement preStatement = connection.prepareStatement("SELECT COUNT(*) FROM ORGANIZATION");
-            preStatement.execute();
-            ResultSet preRS = preStatement.getResultSet();
-            preRS.next();
-            String index = String.valueOf(Integer.valueOf(preRS.getString(1)) + 1);
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO ORGANIZATION VALUES (" + index + ", \'" + req.getParameter("name") + "\', "
-                    + req.getParameter("coordinatex") + ", " + req.getParameter("coordinatey") + ", \'" + req.getParameter("creationDate") + "\', "
-                    + req.getParameter("annualTurnover") + ", \'" + req.getParameter("type") + "\', \'" + req.getParameter("street") + "\', \'"
-                    + req.getParameter("town") + "\')");
-            statement.execute();
 
             connection.close();
         } catch (SQLException |ClassNotFoundException throwable) {

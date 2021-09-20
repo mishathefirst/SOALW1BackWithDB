@@ -17,7 +17,7 @@ public class CertainOrgServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "pwd");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "12032001");
             System.out.println("Successfully set!");
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM ORGANIZATION WHERE ID="
                     + req.getPathInfo().replace("/", ""));
@@ -58,7 +58,7 @@ public class CertainOrgServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "pwd");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "12032001");
             System.out.println("Successfully set!");
 
             PreparedStatement statement = connection.prepareStatement("UPDATE ORGANIZATION SET NAME=\'" + req.getParameter("name") + "\' WHERE ID="
@@ -75,7 +75,7 @@ public class CertainOrgServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "pwd");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "12032001");
             System.out.println("Successfully set!");
             PreparedStatement statement = connection.prepareStatement("DELETE FROM ORGANIZATION WHERE ID="
                     + req.getPathInfo().replace("/", ""));
