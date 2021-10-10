@@ -9,27 +9,59 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 
-@WebServlet("/sort/*")
-public class SortServlet extends HttpServlet {
+@WebServlet("/filter/*")
+public class FilterServlet extends HttpServlet {
     private Connection connection;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            String[] sortingQuery = req.getPathInfo().replaceFirst("/", "").split("/");
-            StringBuilder sortingOrder = new StringBuilder();
-            for (int i = 0; i < sortingQuery.length; i++) {
-                sortingOrder.append(sortingQuery[i]);
-                sortingOrder.append(",");
-            }
-            sortingOrder.deleteCharAt(sortingOrder.length() - 1);
+        String tail = req.getPathInfo().replaceFirst("/", "");
+        String[] params = tail.split("/");
+        String[] operation = new String[params.length];
 
+
+        String[][] queryDetails = new String[params.length][3];
+        for (int i = 0; i < params.length; i++) {
+            queryDetails[i][0] = params[i].split("&")[0];
+            queryDetails[i][1] = params[i].split("&")[1];
+            queryDetails[i][2] = params[i].split("&")[2];
+        }
+
+        for (int i = 0; i < params.length; i++) {
+            if (queryDetails[i][1].equals("g")) {
+                operation[i] = ">";
+            } else if (queryDetails[i][1].equals("ge")) {
+                operation[i] = ">=";
+            } else if (queryDetails[i][1].equals("l")) {
+                operation[i] = "<";
+            } else if (queryDetails[i][1].equals("le")) {
+                operation[i] = "<=";
+            } else {
+                operation[i] = "=";
+            }
+        }
+
+
+        try {
             Class.forName("org.postgresql.Driver");
+            StringBuilder queryString = new StringBuilder("SELECT * FROM ORGANIZATION WHERE ");
+            for (int i = 0; i < params.length; i++) {
+                queryString.append("(");
+                queryString.append(queryDetails[i][0]);
+                queryString.append(operation[i]);
+                queryString.append("'");
+                queryString.append(queryDetails[i][2]);
+                queryString.append("'");
+                queryString.append(")");
+                queryString.append("AND");
+            }
+            queryString.deleteCharAt(queryString.length() - 1);
+            queryString.deleteCharAt(queryString.length() - 1);
+            queryString.deleteCharAt(queryString.length() - 1);
+            System.out.println(queryString);
             connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "12032001");
             System.out.println("Successfully set!");
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ORGANIZATION ORDER BY "
-                    //+ req.getPathInfo().replace("/", ""));
-                    + sortingOrder);
+            PreparedStatement statement = connection.prepareStatement(String.valueOf(queryString));
             statement.execute();
             ResultSet rs = statement.getResultSet();
             rs.next();
